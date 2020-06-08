@@ -1,0 +1,16 @@
+# Use distroless as minimal base image to package the server binary
+# Refer to https://github.com/GoogleContainerTools/distroless for more details
+FROM gcr.io/distroless/base:debug as base
+
+# install ffmpeg
+RUN ["/busybox/sh","-c","wget https://www.moerats.com/usr/down/ffmpeg/ffmpeg-git-64bit-static.tar.xz&&\
+    tar xvf ffmpeg-git-*-static.tar.xz && rm -rf ffmpeg-git-*-static.tar.xz &&\
+    mv ffmpeg-git-*/ffmpeg /usr/bin/ &&\
+    rm -rf ffmpeg-git-*"]
+
+FROM gcr.io/distroless/static:nonroot
+LABEL maintainer="range_liu@moviebook.cn"
+
+COPY --from=base /usr/bin/ffmpeg /usr/bin/
+# Use China timezone
+COPY --from=base /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
